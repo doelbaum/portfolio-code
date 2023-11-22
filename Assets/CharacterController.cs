@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class CharacterController : MonoBehaviour
 {
+    [SerializeField] float speed = 1;
     Animator animator;
     bool isWalking;
     bool walk = false;
@@ -22,10 +23,10 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        UpdateAnimations();
+        QueryAnimations();
     }
 
-    private void UpdateAnimations()
+    private void QueryAnimations()
     {
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -58,15 +59,34 @@ public class CharacterController : MonoBehaviour
             transform.localScale = new Vector3(-200, 200, 200);
             faceLeft = false;
         }
-
-        if (faceForward && isWalking != true)
-        {
-            animator.SetTrigger("FaceForward");
-            faceForward = false;
-        }
     }
 
     private void FixedUpdate()
+    {
+        UpdateAnimations();
+        UpdateMovement();
+    }
+
+    private void UpdateMovement()
+    {
+        if (isWalking)
+        {
+            float moveAmount = Time.deltaTime * speed;
+
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                //Do nothing, already going in the positive direction
+            }
+            else if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                moveAmount *= -1;
+            }
+
+            transform.localPosition += Vector3.right * moveAmount;
+        }
+    }
+
+    void UpdateAnimations()
     {
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
         {
@@ -84,6 +104,12 @@ public class CharacterController : MonoBehaviour
             isWalking = false;
             stopWalking = false;
             walk = false;
+        }
+
+        if (faceForward && isWalking != true)
+        {
+            animator.SetTrigger("FaceForward");
+            faceForward = false;
         }
     }
 }
